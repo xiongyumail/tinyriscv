@@ -1,5 +1,5 @@
 
-RISCV_PATH := $(TOOLCHAIN_DIR)/tools/gnu-mcu-eclipse-riscv-none-gcc-8.2.0-2.2-20190521-0004-win64/
+RISCV_PATH := ${RISCV_NONE_EMBED_GCC_PATH}/../
 
 RISCV_GCC     := $(abspath $(RISCV_PATH)/bin/riscv-none-embed-gcc)
 RISCV_AS      := $(abspath $(RISCV_PATH)/bin/riscv-none-embed-as)
