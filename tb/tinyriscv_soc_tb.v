@@ -505,8 +505,8 @@ module tinyriscv_soc_tb;
     end
 
     tinyriscv_soc_top tinyriscv_soc_top_0(
-        .clk(clk),
-        .rst(rst),
+        .sysclk(clk),
+        .sysrst(rst),
         .uart_debug_pin(1'b0)
 `ifdef TEST_JTAG
         ,

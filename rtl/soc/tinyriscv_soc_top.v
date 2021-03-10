@@ -19,8 +19,10 @@
 // tinyriscv soc顶层模块
 module tinyriscv_soc_top(
 
-    input wire clk,
-    input wire rst,
+    input wire sysclk,        
+    input wire sysrst,
+    
+    output reg sysled,       // 系统状态指示灯
 
     output reg over,         // 测试是否完成信号
     output reg succ,         // 测试是否成功信号
@@ -137,7 +139,63 @@ module tinyriscv_soc_top(
     // 低电平点亮LED
     // 低电平表示已经halt住CPU
     assign halted_ind = ~jtag_halt_req_o;
+    
+    wire clk;
+    assign clk = sysclk;
 
+    reg rst;
+    reg[3:0] rst_cnt;
+
+    always @ (posedge sysclk) begin
+        if (sysrst == `RstEnable) begin
+            rst_cnt <= 4'd0;
+        end else begin
+            if (rst_cnt >= 4'd10 - 1) begin
+                rst_cnt <= 4'd10;
+            end else begin
+                rst_cnt <= rst_cnt + 1'b1;
+            end
+        end
+    end
+
+    always @ (posedge sysclk) begin
+        if (sysrst == `RstEnable) begin
+            rst <= `RstEnable;
+        end else begin
+            if (rst_cnt >= 4'd10 - 1) begin
+                rst <= `RstDisable;
+            end else begin
+                rst <= `RstEnable;
+            end
+        end
+    end
+
+    localparam SYSLED_DIV = 50000000;
+    reg[25:0] sysled_cnt;
+
+    always @ (posedge clk) begin
+        if (rst == `RstEnable) begin
+            sysled_cnt <= 26'd0;
+        end else begin
+            if (sysled_cnt == SYSLED_DIV / 2 - 1) begin
+                sysled_cnt <= 26'd0;
+            end else begin
+                sysled_cnt <= sysled_cnt + 1'd1;
+            end
+        end
+    end
+    
+    always @ (posedge clk) begin
+        if (rst == `RstEnable) begin
+            sysled <= 1'b0;
+        end else begin
+            if (sysled_cnt == SYSLED_DIV / 2 - 1) begin
+                sysled <= !sysled;
+            end else begin
+                sysled <= sysled;
+            end
+        end
+    end
 
     always @ (posedge clk) begin
         if (rst == `RstEnable) begin
@@ -148,7 +206,7 @@ module tinyriscv_soc_top(
             succ <= ~u_tinyriscv.u_regs.regs[27];  // when = 1, run succ, otherwise fail
         end
     end
-
+    
     // tinyriscv处理器核模块例化
     tinyriscv u_tinyriscv(
         .clk(clk),

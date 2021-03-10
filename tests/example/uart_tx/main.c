@@ -9,7 +9,7 @@ int main()
 {
     uart_init();
 
-    xprintf("hello world\n");
+    xprintf("hello world\r\n");
 
     while (1);
 }
