@@ -36,7 +36,7 @@ LINK_OBJS += $(ASM_OBJS) $(C_OBJS)
 LINK_DEPS += $(LINKER_SCRIPT)
 
 CLEAN_OBJS += $(TARGET) $(LINK_OBJS) $(TARGET).dump $(TARGET).bin
-
+CFLAGS += -g
 CFLAGS += -march=$(RISCV_ARCH)
 CFLAGS += -mabi=$(RISCV_ABI)
 CFLAGS += -mcmodel=$(RISCV_MCMODEL) -ffunction-sections -fdata-sections -fno-builtin-printf -fno-builtin-malloc
